@@ -118,14 +118,13 @@ func ToProtoBinary(json []byte) ([]byte, error) {
 // RegisterOpenAPIVersionedService registers a handler to provide access to provided swagger spec.
 //
 // Deprecated: use OpenAPIService.RegisterOpenAPIVersionedService instead.
-func RegisterOpenAPIVersionedService(spec *spec.Swagger, servePath string, handler common.PathHandler) *OpenAPIService {
+func RegisterOpenAPIVersionedService(spec *spec.Swagger, servePath string, handler common.PathHandler) (*OpenAPIService, error) {
 	o := NewOpenAPIService(spec)
-	o.RegisterOpenAPIVersionedService(servePath, handler)
-	return o
+	return o, o.RegisterOpenAPIVersionedService(servePath, handler)
 }
 
 // RegisterOpenAPIVersionedService registers a handler to provide access to provided swagger spec.
-func (o *OpenAPIService) RegisterOpenAPIVersionedService(servePath string, handler common.PathHandler) {
+func (o *OpenAPIService) RegisterOpenAPIVersionedService(servePath string, handler common.PathHandler) error {
 	accepted := []struct {
 		Type                string
 		SubType             string
@@ -178,6 +177,8 @@ func (o *OpenAPIService) RegisterOpenAPIVersionedService(servePath string, handl
 			return
 		}),
 	))
+
+	return nil
 }
 
 // BuildAndRegisterOpenAPIVersionedService builds the spec and registers a handler to provide access to it.
@@ -196,6 +197,5 @@ func BuildAndRegisterOpenAPIVersionedServiceFromRoutes(servePath string, routeCo
 		return nil, err
 	}
 	o := NewOpenAPIService(spec)
-	o.RegisterOpenAPIVersionedService(servePath, handler)
-	return o, nil
+	return o, o.RegisterOpenAPIVersionedService(servePath, handler)
 }
